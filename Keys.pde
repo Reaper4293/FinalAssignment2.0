@@ -262,10 +262,47 @@ void mousePressed()
     scoreList.clear();
     trailList.clear();
 
-    for (int i = 0; i < enemyAmount; i++)
+    //if boss round 1 or 2 or 3
+    if (wave == 9 || wave == 19 || wave == 29)
     {
-
-      enemyList.add(new Enemy(random(1, width), random(1, height), enemyHealth, enemySpeed, enemyDamage));
+      //create 9 blobs
+      for (int i = 0; i < 9; i++)
+      {
+  
+      enemyList.add(new Enemy(random(81, width-80), random(81, height-80), enemyHealth, enemySpeed, enemyDamage));
+      }
+        //core stats        
+        enemyList.get(0).health *= 5;
+        enemyList.get(0).score *= 5;
+        enemyList.get(0).color1 = 255;
+        enemyList.get(0).color2 = 0;
+        enemyList.get(0).color3 = 0;
+        //organize blobs around core
+        enemyList.get(1).posX = enemyList.get(0).posX + enemyList.get(0).mySize/1.5;
+        enemyList.get(1).posY = enemyList.get(0).posY + enemyList.get(0).mySize/1.5;
+        enemyList.get(2).posX = enemyList.get(0).posX - enemyList.get(0).mySize/1.5;
+        enemyList.get(2).posY = enemyList.get(0).posY - enemyList.get(0).mySize/1.5;
+        enemyList.get(3).posX = enemyList.get(0).posX + enemyList.get(0).mySize/1.5;
+        enemyList.get(3).posY = enemyList.get(0).posY - enemyList.get(0).mySize/1.5;
+        enemyList.get(4).posX = enemyList.get(0).posX - enemyList.get(0).mySize/1.5;
+        enemyList.get(4).posY = enemyList.get(0).posY + enemyList.get(0).mySize/1.5;
+        
+        enemyList.get(5).posX = enemyList.get(0).posX + enemyList.get(0).mySize;
+        enemyList.get(5).posY = enemyList.get(0).posY;
+        enemyList.get(6).posX = enemyList.get(0).posX - enemyList.get(0).mySize;
+        enemyList.get(6).posY = enemyList.get(0).posY;
+        enemyList.get(7).posX = enemyList.get(0).posX;
+        enemyList.get(7).posY = enemyList.get(0).posY - enemyList.get(0).mySize;
+        enemyList.get(8).posX = enemyList.get(0).posX;
+        enemyList.get(8).posY = enemyList.get(0).posY + enemyList.get(0).mySize;
+        
+        
+    }else{
+      for (int i = 0; i < enemyAmount; i++)
+      {
+  
+        enemyList.add(new Enemy(random(1, width), random(1, height), enemyHealth, enemySpeed, enemyDamage));
+      }
     }
     
     menu.pause();

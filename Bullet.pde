@@ -104,6 +104,7 @@ void DeleteDeadObjects()
     //IF AN ENEMY GETS KILLED
     if (enemyList.get(e).health <= 0)
     {
+      if (e == 0 && wave == 9 || e == 0 && wave == 19 || e == 0 && wave == 29) bossDead = true;
       scoreList.add(new ScoreText(enemyList.get(e).score * multiplier, enemyList.get(e).posX, enemyList.get(e).posY));
       
       score += enemyList.get(e).score * multiplier;
