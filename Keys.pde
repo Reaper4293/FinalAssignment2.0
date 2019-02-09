@@ -269,7 +269,7 @@ void mousePressed()
       for (int i = 0; i < 9; i++)
       {
   
-      enemyList.add(new Enemy(random(81, width-80), random(81, height-80), enemyHealth, enemySpeed, enemyDamage));
+      enemyList.add(new Enemy(random(90, width-90), random(85, height-85), enemyHealth, enemySpeed, enemyDamage));
       }
         //core stats        
         enemyList.get(0).health *= 5;

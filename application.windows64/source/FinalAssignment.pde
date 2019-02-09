@@ -43,6 +43,7 @@ boolean musicPlaying = false;
 
 int backgroundColor = 0;
 
+boolean bossDead = false;
 
 void setup()
 {
@@ -98,7 +99,7 @@ void setup()
   scoreList.clear();
   trailList.clear();
   
-
+  
   for (int i = 0; i < enemyAmount; i++)
   {
 
@@ -165,6 +166,7 @@ void draw()
     }
 
     //update enemies
+    
     for (int i = 0; i < enemyList.size (); i++) 
     {
       enemyList.get(i).Update();
@@ -238,7 +240,7 @@ void draw()
     }
 
     //END OF ROUND LOGIC AND STUFF
-    if (enemyList.size() == 0)
+    if (enemyList.size() == 0 || (wave == 9 && bossDead) || (wave == 19 && bossDead) || (wave == 29 && bossDead))
     {
       backgroundColor+=3;
       
@@ -257,6 +259,7 @@ void draw()
         wave++;
         multiplierTimer = 180;
         allPurple = false;
+        bossDead = false;
 
         enemySpeed *= 1.1;
         enemyHealth *= 1.1;

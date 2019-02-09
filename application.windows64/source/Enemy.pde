@@ -9,9 +9,9 @@ class Enemy
   float speed = 1;
   float damage = 1;
   float mySize1 = 0; //for hollow circle
-  float color1 = 0;
-  float color2 = 127;
-  float color3 = 255;
+  float color1 = 0;   //R
+  float color2 = 127; //G
+  float color3 = 255; //B
   
   float score = 120;
 
@@ -36,6 +36,8 @@ class Enemy
   float vectorX = 0;
   
   float rotationAngle = 0;
+  
+  boolean bossDead = false;
 
   Enemy(float tempPosX, float tempPosY, float tempHealth, float tempSpeed, float tempDamage)
   {
@@ -54,6 +56,20 @@ class Enemy
       posY = (int)random(1, height);
     }
    
+    //Boss Enemy
+    if (wave == 9 || wave == 19 || wave == 29)
+    {
+      type = 4;
+      damage = damage * 2;
+      speed = speed * 2;
+      mySize = mySize * 4;
+      score = score * 2;
+      health = health * 10;
+      mu = true;
+      md = false;
+      ml = true;
+      mr = false;
+    }
 
     //Expanders
     if (type == 3)
@@ -100,13 +116,67 @@ class Enemy
 
 
 
-
   void Update()
   {
+    
+    //Boss enemy core
+    if (type == 4)
+    {
+      
+      
+      fill(color1, color2, color3);
+      ellipse(posX, posY, mySize, mySize);
+      textAlign(CENTER, CENTER);
+      fill(0);
+      text(nf(health, 1, 1), posX, posY);
+      
+      
+      if (mu)
+        {
+          posY -= speed;
+        } else if (md)
+        {
+          posY += speed;
+        }
 
+        if (ml)
+        {
+          posX -= speed;
+        } else if (mr)
+        {
+          posX += speed;
+        }
+
+        if (posY >= height - mySize/2)
+        {
+          mu = true;
+          md = false;
+        }
+
+        if (posY <= 0 + mySize/2)
+        {
+          mu = false;
+          md = true;
+        }
+
+        if (posX >= width - mySize/2)
+        {
+          ml = true;
+          mr = false;
+        }
+
+        if (posX <= 0 + mySize/2)
+        {
+          ml = false;
+          mr = true;
+        }
+      if (enemyList.size() == 1) type = 1;
+    }
+    
     //Fat Enemies
     if (type == 3)
     {
+      //Change matrix to force translation and rotation to only affect fat enemies
       pushMatrix();
       translate(posX, posY);
       rotate(rotationAngle);
@@ -157,7 +227,7 @@ class Enemy
       }
     }
 
-    //Chaser/Chargers Enemies
+    //Chaser-Charger Enemies
     if (type == 1)
     {
       noFill();
@@ -181,7 +251,7 @@ class Enemy
         fill(255, 255, 0);
       } 
       
-      // If charging stand still and vibrate for 2 seconds
+      // If charging stand still and vibrate for 1 second
       if (chargeDash && !dash)
       {
         if(chargeTimer % 2 == 1)
@@ -211,7 +281,7 @@ class Enemy
         fill(255, 0, 0);
         chargeTimer++;
       }
-      //after charging dash
+      //after charging dash for 1 second
       if (chargeTimer >= 60)
       {
         chargeDash = false;
@@ -225,20 +295,17 @@ class Enemy
         
         dashTimer++;
        
-    
         //X and Y velocity
         posY += vectorY * enemySpeed * 5;
         posX += vectorX * enemySpeed * 5;
-
         
       }
-      
+      //stop dashing after 1 second
       if (dashTimer >= 60)
       {
         dash = false;
         dashTimer = 0;
-        
-        
+               
       }
         
       
@@ -277,8 +344,7 @@ class Enemy
       textAlign(CENTER, CENTER);
       fill(0);
       text(nf(health, 1, 1), posX, posY);
-      
-      
+            
       
       if (allPurple == false)
       {
@@ -338,6 +404,7 @@ class Enemy
           posY+= speed;
         }
       }
-    }
-  }
-}
+    }//end runner
+    
+  }//end update
+}//end enemy class

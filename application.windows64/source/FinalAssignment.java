@@ -61,6 +61,7 @@ boolean musicPlaying = false;
 
 int backgroundColor = 0;
 
+boolean bossDead = false;
 
 public void setup()
 {
@@ -116,7 +117,7 @@ public void setup()
   scoreList.clear();
   trailList.clear();
   
-
+  
   for (int i = 0; i < enemyAmount; i++)
   {
 
@@ -183,6 +184,7 @@ public void draw()
     }
 
     //update enemies
+    
     for (int i = 0; i < enemyList.size (); i++) 
     {
       enemyList.get(i).Update();
@@ -256,7 +258,7 @@ public void draw()
     }
 
     //END OF ROUND LOGIC AND STUFF
-    if (enemyList.size() == 0)
+    if (enemyList.size() == 0 || (wave == 9 && bossDead) || (wave == 19 && bossDead) || (wave == 29 && bossDead))
     {
       backgroundColor+=3;
       
@@ -275,6 +277,7 @@ public void draw()
         wave++;
         multiplierTimer = 180;
         allPurple = false;
+        bossDead = false;
 
         enemySpeed *= 1.1f;
         enemyHealth *= 1.1f;
@@ -425,6 +428,7 @@ public void DeleteDeadObjects()
     //IF AN ENEMY GETS KILLED
     if (enemyList.get(e).health <= 0)
     {
+      if (e == 0 && wave == 9 || e == 0 && wave == 19 || e == 0 && wave == 29) bossDead = true;
       scoreList.add(new ScoreText(enemyList.get(e).score * multiplier, enemyList.get(e).posX, enemyList.get(e).posY));
       
       score += enemyList.get(e).score * multiplier;
@@ -573,9 +577,9 @@ class Enemy
   float speed = 1;
   float damage = 1;
   float mySize1 = 0; //for hollow circle
-  float color1 = 0;
-  float color2 = 127;
-  float color3 = 255;
+  float color1 = 0;   //R
+  float color2 = 127; //G
+  float color3 = 255; //B
   
   float score = 120;
 
@@ -600,6 +604,8 @@ class Enemy
   float vectorX = 0;
   
   float rotationAngle = 0;
+  
+  boolean bossDead = false;
 
   Enemy(float tempPosX, float tempPosY, float tempHealth, float tempSpeed, float tempDamage)
   {
@@ -618,6 +624,20 @@ class Enemy
       posY = (int)random(1, height);
     }
    
+    //Boss Enemy
+    if (wave == 9 || wave == 19 || wave == 29)
+    {
+      type = 4;
+      damage = damage * 2;
+      speed = speed * 2;
+      mySize = mySize * 4;
+      score = score * 2;
+      health = health * 10;
+      mu = true;
+      md = false;
+      ml = true;
+      mr = false;
+    }
 
     //Expanders
     if (type == 3)
@@ -664,13 +684,67 @@ class Enemy
 
 
 
-
   public void Update()
   {
+    
+    //Boss enemy core
+    if (type == 4)
+    {
+      
+      
+      fill(color1, color2, color3);
+      ellipse(posX, posY, mySize, mySize);
+      textAlign(CENTER, CENTER);
+      fill(0);
+      text(nf(health, 1, 1), posX, posY);
+      
+      
+      if (mu)
+        {
+          posY -= speed;
+        } else if (md)
+        {
+          posY += speed;
+        }
 
+        if (ml)
+        {
+          posX -= speed;
+        } else if (mr)
+        {
+          posX += speed;
+        }
+
+        if (posY >= height - mySize/2)
+        {
+          mu = true;
+          md = false;
+        }
+
+        if (posY <= 0 + mySize/2)
+        {
+          mu = false;
+          md = true;
+        }
+
+        if (posX >= width - mySize/2)
+        {
+          ml = true;
+          mr = false;
+        }
+
+        if (posX <= 0 + mySize/2)
+        {
+          ml = false;
+          mr = true;
+        }
+      if (enemyList.size() == 1) type = 1;
+    }
+    
     //Fat Enemies
     if (type == 3)
     {
+      //Change matrix to force translation and rotation to only affect fat enemies
       pushMatrix();
       translate(posX, posY);
       rotate(rotationAngle);
@@ -721,7 +795,7 @@ class Enemy
       }
     }
 
-    //Chaser/Chargers Enemies
+    //Chaser-Charger Enemies
     if (type == 1)
     {
       noFill();
@@ -745,7 +819,7 @@ class Enemy
         fill(255, 255, 0);
       } 
       
-      // If charging stand still and vibrate for 2 seconds
+      // If charging stand still and vibrate for 1 second
       if (chargeDash && !dash)
       {
         if(chargeTimer % 2 == 1)
@@ -775,7 +849,7 @@ class Enemy
         fill(255, 0, 0);
         chargeTimer++;
       }
-      //after charging dash
+      //after charging dash for 1 second
       if (chargeTimer >= 60)
       {
         chargeDash = false;
@@ -789,20 +863,17 @@ class Enemy
         
         dashTimer++;
        
-    
         //X and Y velocity
         posY += vectorY * enemySpeed * 5;
         posX += vectorX * enemySpeed * 5;
-
         
       }
-      
+      //stop dashing after 1 second
       if (dashTimer >= 60)
       {
         dash = false;
         dashTimer = 0;
-        
-        
+               
       }
         
       
@@ -841,8 +912,7 @@ class Enemy
       textAlign(CENTER, CENTER);
       fill(0);
       text(nf(health, 1, 1), posX, posY);
-      
-      
+            
       
       if (allPurple == false)
       {
@@ -902,9 +972,10 @@ class Enemy
           posY+= speed;
         }
       }
-    }
-  }
-}
+    }//end runner
+    
+  }//end update
+}//end enemy class
 public void keyPressed()
 {
 
@@ -1169,10 +1240,47 @@ public void mousePressed()
     scoreList.clear();
     trailList.clear();
 
-    for (int i = 0; i < enemyAmount; i++)
+    //if boss round 1 or 2 or 3
+    if (wave == 9 || wave == 19 || wave == 29)
     {
-
-      enemyList.add(new Enemy(random(1, width), random(1, height), enemyHealth, enemySpeed, enemyDamage));
+      //create 9 blobs
+      for (int i = 0; i < 9; i++)
+      {
+  
+      enemyList.add(new Enemy(random(90, width-90), random(85, height-85), enemyHealth, enemySpeed, enemyDamage));
+      }
+        //core stats        
+        enemyList.get(0).health *= 5;
+        enemyList.get(0).score *= 5;
+        enemyList.get(0).color1 = 255;
+        enemyList.get(0).color2 = 0;
+        enemyList.get(0).color3 = 0;
+        //organize blobs around core
+        enemyList.get(1).posX = enemyList.get(0).posX + enemyList.get(0).mySize/1.5f;
+        enemyList.get(1).posY = enemyList.get(0).posY + enemyList.get(0).mySize/1.5f;
+        enemyList.get(2).posX = enemyList.get(0).posX - enemyList.get(0).mySize/1.5f;
+        enemyList.get(2).posY = enemyList.get(0).posY - enemyList.get(0).mySize/1.5f;
+        enemyList.get(3).posX = enemyList.get(0).posX + enemyList.get(0).mySize/1.5f;
+        enemyList.get(3).posY = enemyList.get(0).posY - enemyList.get(0).mySize/1.5f;
+        enemyList.get(4).posX = enemyList.get(0).posX - enemyList.get(0).mySize/1.5f;
+        enemyList.get(4).posY = enemyList.get(0).posY + enemyList.get(0).mySize/1.5f;
+        
+        enemyList.get(5).posX = enemyList.get(0).posX + enemyList.get(0).mySize;
+        enemyList.get(5).posY = enemyList.get(0).posY;
+        enemyList.get(6).posX = enemyList.get(0).posX - enemyList.get(0).mySize;
+        enemyList.get(6).posY = enemyList.get(0).posY;
+        enemyList.get(7).posX = enemyList.get(0).posX;
+        enemyList.get(7).posY = enemyList.get(0).posY - enemyList.get(0).mySize;
+        enemyList.get(8).posX = enemyList.get(0).posX;
+        enemyList.get(8).posY = enemyList.get(0).posY + enemyList.get(0).mySize;
+        
+        
+    }else{
+      for (int i = 0; i < enemyAmount; i++)
+      {
+  
+        enemyList.add(new Enemy(random(1, width), random(1, height), enemyHealth, enemySpeed, enemyDamage));
+      }
     }
     
     menu.pause();
