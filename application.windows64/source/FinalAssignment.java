@@ -631,7 +631,7 @@ class Enemy
       damage = damage * 2;
       speed = speed * 2;
       mySize = mySize * 4;
-      score = score * 2;
+      score = score * 5;
       health = health * 10;
       mu = true;
       md = false;
